@@ -29,9 +29,7 @@
     </script>
   </head>
   <body ng-app="nightstandApp" ng-controller="NightstandController">
-    <div class="container">
-      <div class="page-header"><h1>Nightstand</h1></div>
-
+    <div class="container" style="padding-top: 25px;">
       <ul class="list-group">
         <button type="button" class="btn btn-lg btn-block" ng-class="{'btn-primary': state.active, 'btn-default': !state.active}" ng-repeat="state in states" ng-click="post_state(state.name);">{{state.name}}</button>
       </ul>
