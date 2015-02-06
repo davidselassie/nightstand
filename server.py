@@ -1,3 +1,4 @@
+from night_tools import linear_map
 from night_tools import put_encode
 from night_tools import fill
 from night_tools import sprinkle
@@ -122,47 +123,42 @@ def map_range(i, min_v, max_v, x):
     return i[int(p * (len(i) - 1))]
 
 
-class TemperatureThread(Thread):
-    name = 'Temp'
+class WeatherThread(Thread):
+    name = 'Weather'
 
     _curl = 'https://api.forecast.io/forecast/89baad8cfc93b3899fb1fd580745b40c/37.812265,-122.280879'
     _alive = True
 
+    _open_sky_color = Color('#18C0FF')
+    _cloud_color = Color('#495167')
+
     def _get_temp_cc(self):
-        # resp_json = json.loads(urllib.request.urlopen(self._curl).read())
-        # temp = resp_json['currently']['temperature']
-        # cc = resp_json['currently']['cloudCover']
-        temp = 70.0
-        cc = 0.0
+        resp_json = json.loads(urllib.request.urlopen(self._curl).read().decode('utf8'))
+        temp = resp_json['currently']['temperature']
+        cc = resp_json['currently']['cloudCover']
         print('temp = {0}, cc = {1}'.format(temp, cc))
         return temp, cc
 
-    def _temp_cc_to_color(self, temp, cc):
-        _hot_tF = 100.0
-        _cold_tF = 30.0
-        _hot = Color('red')
-        _cold = Color('blue')
-        _range = list(_cold.range_to(_hot, int(_hot_tF - _cold_tF)))
-
-        c = map_range(_range, _cold_tF, _hot_tF, temp)
-
-        c.luminance = (1.0 - cc) * 0.5
-        
+    def _temp_to_color(self, temp):
+        c = bb(linear_map(temp, 30, 100, 10000, 1000))
         return c
 
     def run(self):
         while self._alive:
             temp, cc = self._get_temp_cc()
-            color = self._temp_cc_to_color(temp, cc)
-            p = fill(color)
+            temp_color = self._temp_to_color(temp)
+            ground_p = fill(temp_color, STRAND_NUM_LEDS)
+            sky_p = fill(self._open_sky_color, STRAND_NUM_LEDS)
+            sky_p = sprinkle(sky_p, self._cloud_color, cc)
+            p = mux(ground_p, sky_p)
             c.put_pixels(put_encode(p))
-            time.sleep(5 * 60)
+            time.sleep(15 * 60)
 
     def kill(self):
         self._alive = False
 
 
-KNOWN_STATES = (OffThread, LampThread, OnThread, RainbowThread, HellThread, BarberThread, TemperatureThread)
+KNOWN_STATES = (OffThread, LampThread, OnThread, RainbowThread, HellThread, BarberThread, WeatherThread)
 KNOWN_NAMES_TO_STATE = {
     state.name: state
     for state

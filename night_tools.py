@@ -93,3 +93,8 @@ def sprinkle(pixels, spark_color, density=0.1):
     for i in random.sample(range(len(pixels)), pi):
         out[i] = spark_color
     return out
+
+
+def linear_map(x, dl, du, rl, ru):
+    pct = (x - dl) / (du - dl)
+    return pct * (ru - rl) + rl
