@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Nightstand</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0/angular.min.js"></script>
+    <script>
+      var nightstandApp = angular.module("nightstandApp", []);
+
+      nightstandApp.controller("NightstandController", function ($scope, $http) {
+      $scope.states = [];
+      $scope.active_params = {};
+      $scope.update_states = function () {
+      $http.get("/state").success(function(data, status, headers, config) {
+      $scope.states = data.states;
+      $scope.active_params = data.active_params;
+      });
+      };
+      $scope.post_state = function (name) {
+      $http.get("/state/" + name).success(function (data, status, headers, config) {
+      $scope.update_states();
+      });
+      };
+
+      $scope.update_states();
+      });
+    </script>
+  </head>
+  <body ng-app="nightstandApp" ng-controller="NightstandController">
+    <div class="container">
+      <div class="page-header"><h1>Nightstand</h1></div>
+
+      <ul class="list-group">
+        <button type="button" class="btn btn-lg btn-block" ng-class="{'btn-primary': state.active, 'btn-default': !state.active}" ng-repeat="state in states" ng-click="post_state(state.name);">{{state.name}}</button>
+      </ul>
+    </div>
+  </body>
+</html>
