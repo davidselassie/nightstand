@@ -152,6 +152,7 @@ class WeatherThread(Thread):
             sky_p = sprinkle(sky_p, self._cloud_color, cc)
             p = mux(ground_p, sky_p)
             c.put_pixels(put_encode(p))
+            c.put_pixels(put_encode(p))
             time.sleep(15 * 60)
 
     def kill(self):
