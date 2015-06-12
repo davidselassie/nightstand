@@ -102,7 +102,7 @@ class BarberThread(Thread):
 
 class RainbowThread(Thread):
     name = 'Rainbow'
-    period_sec = 60
+    period_sec = 120
 
     _alive = True
 
